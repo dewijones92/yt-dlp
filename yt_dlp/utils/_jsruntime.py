@@ -142,7 +142,10 @@ class QuickJsRuntime(JsRuntime):
             return None
         is_ng = 'QuickJS-ng' in out
 
-        version = detect_exe_version(out, r'^QuickJS(?:-ng)?\s+version\s+(\S+)', 'unknown')
+        # `(?m)` so the version is found even when other lines precede it, e.g. an Android
+        # bionic dynamic-linker warning printed to stderr (and merged into the probe output)
+        # when running a qjs built for a newer API level on an older device.
+        version = detect_exe_version(out, r'(?m)^QuickJS(?:-ng)?\s+version\s+(\S+)', 'unknown')
         vt = version_tuple(version, lenient=True)
         if is_ng:
             return JsRuntimeInfo(
